@@ -20,10 +20,13 @@ for url in RSS:
 
     text = f"📰 {news.title}\n\n{news.link}"
 
-    requests.post(
+    r = requests.post(
         f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
         data={
             "chat_id": CHAT_ID,
             "text": text
         }
     )
+
+    print(r.status_code)
+    print(r.text)
