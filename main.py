@@ -1,37 +1,29 @@
 import os
-import feedparser
 import requests
-from telegram import Bot
+import feedparser
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-bot = Bot(token=BOT_TOKEN)
-
-# 这里填写RSS
-RSS_FEEDS = [
+RSS = [
     "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
     "https://feeds.bbci.co.uk/news/world/rss.xml",
 ]
 
-def send(text):
-    bot.send_message(chat_id=CHAT_ID, text=text)
+for url in RSS:
+    feed = feedparser.parse(url)
 
-def main():
-    for url in RSS_FEEDS:
-        feed = feedparser.parse(url)
+    if not feed.entries:
+        continue
 
-        if not feed.entries:
-            continue
+    news = feed.entries[0]
 
-        news = feed.entries[0]
+    text = f"📰 {news.title}\n\n{news.link}"
 
-        title = news.title
-        link = news.link
-
-        message = f"📰 {title}\n\n{link}"
-
-        send(message)
-
-if __name__ == "__main__":
-    main()
+    requests.post(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+        data={
+            "chat_id": CHAT_ID,
+            "text": text
+        }
+    )
