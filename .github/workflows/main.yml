@@ -1,28 +1,13 @@
-name: Telegram News
+import os
+import requests
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "*/30 * * * *"
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+CHAT_ID = os.getenv("CHAT_ID")
 
-jobs:
-  run:
-    runs-on: ubuntu-latest
+r = requests.post(
+    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+    data={"chat_id": CHAT_ID, "text": "✅ GitHub 测试成功！"}
+)
 
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Run bot
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: |
-          python main.py
+print(r.status_code)
+print(r.text)
